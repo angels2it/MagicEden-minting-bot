@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def mint(values, isWindows):
-    def initWallet():
+    def initWallet(): 
         print("Status - Initializing wallet")
         # add wallet to chrome
 
