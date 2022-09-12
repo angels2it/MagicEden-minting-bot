@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def mint(values, isWindows):
-    def initWallet(): 
+    def initWallet():
         print("Status - Initializing wallet")
         # add wallet to chrome
 
@@ -98,6 +98,7 @@ def mint(values, isWindows):
                 (By.XPATH, "//button/div/span[contains(text(),'Phantom')]")
             )
         )
+        time.sleep(5)
         phantom = driver.find_element(
             By.XPATH, "//button/div/span[contains(text(),'Phantom')]"
         )
