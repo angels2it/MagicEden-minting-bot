@@ -10,8 +10,8 @@ import monkelabs
 
 
 def getConfig():
-    configFile = open("config.json", 'r')
-    return list(json.load(configFile).values())
+        configFile = open("config.json", 'r')
+        return list(json.load(configFile).values())
 
 
 #gets config
