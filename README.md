@@ -71,8 +71,6 @@ Easy setup which uses ChromeDriver to open up a new chrome instance and mint the
 
     `seedPhrase` --> Specify the passphrase wallet (Careful do not share this key)
 
-    `password` --> Enter your wallet password
-
 5. Open CMD and go to directory
 
     `cd /path/to/directory/magiceden-minting-bot-main/`
