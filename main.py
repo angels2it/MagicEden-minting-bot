@@ -4,6 +4,7 @@ import json
 import magiceden
 #import helper functions for monkeylabs
 import monkelabs
+import blue
 
 
 
@@ -29,6 +30,11 @@ if "magiceden.io" in config[0]:
 elif "monkelabs.io" in config[0]:
     print("Found monkelabs.io link")
     monkelabs.mint(config, isWindows)
+
+#if mint on test.io
+elif "stackoverflow.com" in config[0]:
+    print("Found stackoverflow.com link")
+    blue.mint(config, isWindows)
 
 #if platform not supported
 else:
