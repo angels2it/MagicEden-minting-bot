@@ -32,8 +32,8 @@ elif "monkelabs.io" in config[0]:
     monkelabs.mint(config, isWindows)
 
 #if mint on test.io
-elif "topaz.so" in config[0]:
-    print("Found stackoverflow.com link")
+elif "bluemove.net" in config[0]:
+    print("Found bluemove.net link")
     blue.mint(config, isWindows)
 
 #if platform not supported

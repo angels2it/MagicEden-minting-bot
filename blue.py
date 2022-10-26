@@ -54,9 +54,10 @@ def mint(values, isWindows):
         main_window = browser.window_handles[0]
         browser.switch_to.window(main_window)
         print("Status - Waiting for Mint, maximum time wait is 24h, after that please restart bot")
-        mint_your_token = driver.find_element(
-            By.XPATH, "//*[contains(text(), 'Mint Now')]")
-        driver.execute_script("arguments[0].click();", mint_your_token)
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[contains(text(), 'Mint Now')]")))
+        browser.find_element(
+            By.XPATH, "//*[contains(text(), 'Mint Now')]").click()
         time.sleep(5)
 
         WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
@@ -68,6 +69,43 @@ def mint(values, isWindows):
         print('has approve')
         browser.find_element(
             By.XPATH, "//button[contains(text(), 'Cancel')]").click()
+
+        time.sleep(5)
+
+    def connectSuiStep(browser):
+        print('sui click')
+        browser.find_element(By.XPATH, "//*[contains(text(), 'Sui Wallet')]").click()
+
+    def bluemoveMint(browser):
+        browser.switch_to.window(browser.window_handles[0])
+        print("Status - Waiting for Mint, maximum time wait is 24h, after that please restart bot")
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//button[contains(text(), 'Mint')]")))
+        browser.find_element(
+            By.XPATH, "//button[contains(text(), 'Mint')]").click()
+        time.sleep(5)
+        print('call mint')
+        if len(browser.find_elements(By.XPATH, "//*[contains(text(), 'Sui Wallet')]")) > 0:
+            connectSuiStep(browser)
+            print('call mint again')
+            time.sleep(2)
+            browser.switch_to.window(browser.window_handles[0])
+            WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//button[contains(text(), 'Mint')]")))
+            browser.find_element(
+            By.XPATH, "//button[contains(text(), 'Mint')]").click()
+        else:
+            print('no sui wallet click')
+
+        WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+        print('switch')
+        browser.switch_to.window(browser.window_handles[1])
+
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[contains(text(), 'Approve')]")))
+        print('has approve')
+        browser.find_element(
+            By.XPATH, "//*[contains(text(), 'Approve')]").click()
 
         time.sleep(5)
 
@@ -147,26 +185,49 @@ def mint(values, isWindows):
         print('Connect wallet')
         main_window = browser.window_handles[0]
         browser.switch_to.window(main_window)
+        time.sleep(10)
 
-        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Connect Wallet')]")))
-
-        browser.find_element(By.XPATH, "//*[contains(text(), 'Connect Wallet')]").click()
-        time.sleep(2)
+        if browser.find_elements(By.XPATH, "//*[contains(text(), 'Connect Wallet')]").count() > 0:
+            browser.find_element(By.XPATH, "//*[contains(text(), 'Connect Wallet')]").click()
+            time.sleep(2)
         
-        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Petra Wallet')]")))
-        browser.find_element(By.XPATH, "//*[contains(text(), 'Petra Wallet')]").click()
-        original_window = browser.current_window_handle
-        WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
-        print('switch')
-        browser.switch_to.window(browser.window_handles[1])
-        time.sleep(2)
+            WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Petra Wallet')]")))
+            browser.find_element(By.XPATH, "//*[contains(text(), 'Petra Wallet')]").click()
+            original_window = browser.current_window_handle
+            WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+            print('switch')
+            browser.switch_to.window(browser.window_handles[1])
+            time.sleep(2)
 
-        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
-            (By.XPATH, "//button[contains(text(), 'Approve')]")))
-        print('has approve')
-        browser.find_element(
-            By.XPATH, "//button[contains(text(), 'Approve')]").click()
+            WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+                (By.XPATH, "//button[contains(text(), 'Approve')]")))
+            print('has approve')
+            browser.find_element(
+                By.XPATH, "//button[contains(text(), 'Approve')]").click()
+        else:
+            print("already connected")
 
+    def blueMoveConnectWallet(browser):
+        print('Connect wallet')
+        main_window = browser.window_handles[0]
+        browser.switch_to.window(main_window)
+        if len(browser.find_elements(By.XPATH, "//*[contains(text(), 'Connect Wallet')]")) > 0:
+            browser.find_element(By.XPATH, "//*[contains(text(), 'Connect Wallet')]").click()
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Sui Wallet')]")))
+            print('found sui')
+            browser.find_element(By.XPATH, "//*[contains(text(), 'Sui Wallet')]").click()
+            original_window = browser.current_window_handle
+            WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+            print('switch')
+            browser.switch_to.window(browser.window_handles[1])
+            WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(), 'Connect')]")))
+            print('has approve')
+            browser.find_element(
+                By.XPATH, "//*[contains(text(), 'Connect')]").click()
+        else:
+            print("already connected")
+    
     def initChrome(profile):
         options = Options()
 
@@ -212,22 +273,42 @@ def mint(values, isWindows):
 
         return main_window
 
+    def unlockBluemoveWallet(browser):
+        print("Unlock wallet")
+        WebDriverWait(browser, 10).until(EC.number_of_windows_to_be(2))
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
+        password1 = browser.find_element(By.XPATH, "//input[@name='password']").send_keys('s2xEvilFucking')
+        submit = browser.find_element(By.XPATH, "//*[contains(text(), 'Unlock')]").click()
+        time.sleep(5)
+        browser.close()
+        print("Finished unlock wallet")
+        main_window = browser.window_handles[0]
+        browser.switch_to.window(main_window)
+
+        return main_window
+
+    def openPetraWallet(browser):
+        browser.get("chrome-extension://ejjladinnckdgjemekebdpeokbikhfci/index.html")
+
+    def openSuiWallet(browser):
+        browser.get("chrome-extension://opcgpfmipidbgpenhmajoajpbobppdil/ui.html")
+
     def runFlow(browser):
         browser.get(values[0])
-
         # Open a new window
         browser.execute_script("window.open('');")
         # Switch to the new window
         browser.switch_to.window(browser.window_handles[1])
-        browser.get("chrome-extension://ejjladinnckdgjemekebdpeokbikhfci/index.html")
-
+        # openPetraWallet(browser)
+        openSuiWallet(browser)
         # main_window = initWallet()
         unlockWallet(browser)
         # clickClaim(browser)
-        connectWallet(browser)
+        blueMoveConnectWallet(browser)
         # selectWallet()
 
-        avaitMint(browser)
+        # avaitMint(browser)
+        bluemoveMint(browser)
 
     print("Bot started") 
     if isWindows:
