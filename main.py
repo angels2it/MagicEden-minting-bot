@@ -32,7 +32,7 @@ elif "monkelabs.io" in config[0]:
     monkelabs.mint(config, isWindows)
 
 #if mint on test.io
-elif "stackoverflow.com" in config[0]:
+elif "topaz.so" in config[0]:
     print("Found stackoverflow.com link")
     blue.mint(config, isWindows)
 

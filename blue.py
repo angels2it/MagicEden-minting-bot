@@ -1,4 +1,6 @@
+from lib2to3.pgen2 import driver
 import time
+import multiprocessing
 import os
 import pathlib
 from selenium import webdriver
@@ -48,24 +50,46 @@ def mint(values, isWindows):
 
 
 
-    def avaitMint():
+    def avaitMint(browser):
+        main_window = browser.window_handles[0]
+        browser.switch_to.window(main_window)
         print("Status - Waiting for Mint, maximum time wait is 24h, after that please restart bot")
-        WebDriverWait(driver, 60*60*24).until(EC.presence_of_element_located(
-            (By.XPATH, "//a[contains(text(), 'Log in')]")))
         mint_your_token = driver.find_element(
-            By.XPATH, "//a[contains(text(), 'Log in')]")
+            By.XPATH, "//*[contains(text(), 'Mint Now')]")
         driver.execute_script("arguments[0].click();", mint_your_token)
+        time.sleep(5)
 
-        original_window = driver.current_window_handle
-        WebDriverWait(driver, 60).until(EC.number_of_windows_to_be(2))
-        for window_handle in driver.window_handles:
+        WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+        print('switch')
+        browser.switch_to.window(browser.window_handles[1])
+
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//button[contains(text(), 'Cancel')]")))
+        print('has approve')
+        browser.find_element(
+            By.XPATH, "//button[contains(text(), 'Cancel')]").click()
+
+        time.sleep(5)
+
+    def clickClaim(browser):
+        print("Status - Waiting for Claim, maximum time wait is 24h, after that please restart bot")
+        WebDriverWait(browser, 60*60*24).until(EC.presence_of_element_located(
+            (By.XPATH, "//*[contains(text(), 'Activate Faucet)]")))
+        
+        mint_your_token = browser.find_element(
+            By.XPATH, "//*[contains(text(), 'Activate Faucet')]")
+        browser.execute_script("arguments[0].click();", mint_your_token)
+
+        original_window = browser.current_window_handle
+        WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+        for window_handle in browser.window_handles:
             if window_handle != original_window:
-                driver.switch_to.window(window_handle)
+                browser.switch_to.window(window_handle)
                 break
 
-        WebDriverWait(driver, 60).until(EC.presence_of_element_located(
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
             (By.XPATH, "//button[@class='sc-bqiRlB hLGcmi sc-hBUSln dhBqSt']")))
-        approve = driver.find_element(
+        approve = browser.find_element(
             By.XPATH, "//button[@class='sc-bqiRlB hLGcmi sc-hBUSln dhBqSt']")
         approve.click()
         time.sleep(50)
@@ -119,17 +143,60 @@ def mint(values, isWindows):
 
         return main_window
 
-    def unlockWallet():
+    def connectWallet(browser):
+        print('Connect wallet')
+        main_window = browser.window_handles[0]
+        browser.switch_to.window(main_window)
+
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Connect Wallet')]")))
+
+        browser.find_element(By.XPATH, "//*[contains(text(), 'Connect Wallet')]").click()
+        time.sleep(2)
+        
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Petra Wallet')]")))
+        browser.find_element(By.XPATH, "//*[contains(text(), 'Petra Wallet')]").click()
+        original_window = browser.current_window_handle
+        WebDriverWait(browser, 60).until(EC.number_of_windows_to_be(2))
+        print('switch')
+        browser.switch_to.window(browser.window_handles[1])
+        time.sleep(2)
+
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "//button[contains(text(), 'Approve')]")))
+        print('has approve')
+        browser.find_element(
+            By.XPATH, "//button[contains(text(), 'Approve')]").click()
+
+    def initChrome(profile):
+        options = Options()
+
+
+        # options.add_extension("Petra-Aptos-Wallet.crx")
+        options.add_argument("--disable-gpu")
+
+        prefs = {"profile.managed_default_content_settings.images": 1}
+        options.add_experimental_option("prefs", prefs)
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+        options.add_argument(r"--user-data-dir=/Users/angelit/Downloads/Chrome " + profile) #e.g. C:\Users\You\AppData\Local\Google\Chrome\User Data
+        options.add_argument(r'--profile-directory=' + profile) #e.g. Profile 3
+
+        # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        chrome_driver_binary = "/Users/angelit/Downloads/chromedriver"
+        driver = webdriver.Chrome(chrome_driver_binary, options=options)
+        return driver
+
+    def unlockWallet(browser):
         print("Unlock wallet")
         # original_window = driver.current_window_handle
-        WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
+        WebDriverWait(browser, 10).until(EC.number_of_windows_to_be(2))
         # for window_handle in driver.window_handles:
         #     if window_handle != original_window:
         #         driver.switch_to.window(window_handle)
         #         break
-        WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
-        password1 = driver.find_element(By.XPATH, "//input[@name='password']").send_keys('s2xEvilFucking')
-        submit = driver.find_element(By.XPATH, "//*[contains(text(), 'Unlock')]").click()
+        WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
+        password1 = browser.find_element(By.XPATH, "//input[@name='password']").send_keys('s2xEvilFucking')
+        submit = browser.find_element(By.XPATH, "//*[contains(text(), 'Unlock')]").click()
         time.sleep(5)
         # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//button[@type='submit']")))
         # continue__ = driver.find_element(By.XPATH, "//button[@type='submit']").click()
@@ -138,12 +205,29 @@ def mint(values, isWindows):
         # finish = driver.find_element(
         #     By.XPATH, "//button[@class='sc-eCImPb fimA-Dk']")
         # finish.click()
-        driver.close()
+        browser.close()
         print("Finished unlock wallet")
-        main_window = driver.window_handles[0]
-        driver.switch_to.window(main_window)
+        main_window = browser.window_handles[0]
+        browser.switch_to.window(main_window)
 
         return main_window
+
+    def runFlow(browser):
+        browser.get(values[0])
+
+        # Open a new window
+        browser.execute_script("window.open('');")
+        # Switch to the new window
+        browser.switch_to.window(browser.window_handles[1])
+        browser.get("chrome-extension://ejjladinnckdgjemekebdpeokbikhfci/index.html")
+
+        # main_window = initWallet()
+        unlockWallet(browser)
+        # clickClaim(browser)
+        connectWallet(browser)
+        # selectWallet()
+
+        avaitMint(browser)
 
     print("Bot started") 
     if isWindows:
@@ -152,22 +236,8 @@ def mint(values, isWindows):
         print("OS : Mac")
     
 
-    options = Options()
-
-
-    # options.add_extension("Petra-Aptos-Wallet.crx")
-    options.add_argument("--disable-gpu")
-
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    options.add_experimental_option("prefs", prefs)
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-
-    options.add_argument(r"--user-data-dir=/Users/angelit/Library/Application Support/Google/Chrome") #e.g. C:\Users\You\AppData\Local\Google\Chrome\User Data
-    options.add_argument(r'--profile-directory=Profile 2') #e.g. Profile 3
-
-    # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    chrome_driver_binary = "/Users/angelit/Downloads/chromedriver"
-    driver = webdriver.Chrome(chrome_driver_binary, options=options)
+    driver = initChrome('Profile 2')
+    # driver2 = initChrome('Default')
     os.environ['WDM8LOCAL'] = '1'
 
 
@@ -176,24 +246,12 @@ def mint(values, isWindows):
     
     print("Assertion - successfully found chrome driver")
     
+    runFlow(driver)
 
-
-
-    driver.get(values[0])
-
-
-    # Open a new window
-    driver.execute_script("window.open('');")
-    # Switch to the new window
-    driver.switch_to.window(driver.window_handles[1])
-    driver.get("chrome-extension://ejjladinnckdgjemekebdpeokbikhfci/index.html")
-
-    # main_window = initWallet()
-    main_window = unlockWallet()
-
-    # selectWallet()
-
-    avaitMint()
+    # process1 = multiprocessing.Process(target=runFlow, args=(driver,))
+    # process2 = multiprocessing.Process(target=runFlow, args=(driver2,))
+    # process1.start()
+    # process2.start()
 
     print("Minting Finished")
 
