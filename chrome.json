@@ -1,0 +1,14 @@
+{
+  "dir": "/Users/angelit/Downloads/Chrome",
+  "driver": "/Users/angelit/Downloads/chromedriver",
+  "profiles": [
+    {
+      "name": "Default",
+      "group": "Test"
+    },
+    {
+      "name": "Profile 2",
+      "group": "Test"
+    }
+  ]
+}
