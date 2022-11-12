@@ -43,12 +43,11 @@ def run(config, profile):
         # driver.execute_script(
         #     "var ele=arguments[0]; ele.innerHTML = 'Google';", inputEle)
         inputEle.click()
-        print(len(lines))
         content = random.choice(lines)
         for char in content:
             inputEle.send_keys(char)
-        print("Sleep 60s")
-        time.sleep(10)
+        print("Sleep " + str(config["timeToChat"]) + " seconds")
+        time.sleep(config["timeToChat"])
 
     def initChrome(profile):
         options = Options()

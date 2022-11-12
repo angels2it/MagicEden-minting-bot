@@ -10,5 +10,6 @@
       "name": "Profile 2",
       "group": "Test"
     }
-  ]
+  ],
+  "timeToChat": 10
 }

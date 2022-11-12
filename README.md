@@ -1,1 +1,1 @@
-conda activate pygplates        
+conda activate pygplates
