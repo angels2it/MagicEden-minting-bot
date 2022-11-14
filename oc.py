@@ -13,19 +13,25 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from webdriver_manager.chrome import ChromeDriverManager
 
-url = 'https://oc.app/?ref=zpgzy-piaaa-aaaaf-apxsq-cai'
+url = 'https://oc.app'
+
+numOfMessageToSend = 0
 
 with open('content.txt') as f:
     lines = f.readlines()
 
+
 def run(config, profile):
+    global numOfMessageToSend
     profileName = profile["name"]
     groupName = profile["group"]
+    numOfMessageToSend = config["numberOfMessageToSend"]
     print("Bot started with profile "+profile["name"])
 
     def autoChatOC(browser):
+        global numOfMessageToSend
         browser.switch_to.window(browser.window_handles[0])
-        print('click on group chat')
+        print('(' + str(numOfMessageToSend) + ') click on group chat')
         WebDriverWait(browser, 60).until(EC.presence_of_element_located(
             (By.XPATH, "//*[contains(text(), '" + groupName + "')]")))
         browser.find_element(
@@ -48,6 +54,8 @@ def run(config, profile):
             inputEle.send_keys(char)
         print("Sleep " + str(config["timeToChat"]) + " seconds")
         time.sleep(config["timeToChat"])
+        numOfMessageToSend = numOfMessageToSend - 1
+        browser.close()
 
     def initChrome(profile):
         options = Options()
@@ -61,7 +69,7 @@ def run(config, profile):
 
         # e.g. C:\Users\You\AppData\Local\Google\Chrome\User Data
         options.add_argument(
-            r"--user-data-dir="+ config["dir"] +" " + profile)
+            r"--user-data-dir=" + config["dir"])
         options.add_argument(r'--profile-directory=' +
                              profile)  # e.g. Profile 3
 
@@ -71,9 +79,10 @@ def run(config, profile):
         return driver
 
     def runFlow(browser):
-        # browser.switch_to.window(browser.window_handles[0])
+        global numOfMessageToSend
+        browser.switch_to.window(browser.window_handles[0])
         browser.get(url)
-        while True:
+        while numOfMessageToSend > 0:
             autoChatOC(browser)
 
     driver = initChrome(profileName)

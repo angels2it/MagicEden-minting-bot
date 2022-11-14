@@ -1,5 +1,5 @@
 {
-  "dir": "/Users/angelit/Downloads/Chrome",
+  "dir": "/Users/angelit/Library/Application Support/Google/Chrome",
   "driver": "/Users/angelit/Downloads/chromedriver",
   "profiles": [
     {
@@ -11,5 +11,6 @@
       "group": "Test"
     }
   ],
-  "timeToChat": 10
+  "timeToChat": 10,
+  "numberOfMessageToSend": 2
 }

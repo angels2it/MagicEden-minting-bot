@@ -12,4 +12,5 @@ def getConfig():
 config = getConfig()
 
 for p in list(config["profiles"]):
-    Thread(target=oc.run, args=(config, p,)).start()
+    oc.run(config, p)
+    # Thread(target=oc.run, args=(config, p,)).start()
